@@ -97,7 +97,9 @@ function showCard(event) {
     }
 
     if (moveCounter === 15 || moveCounter === 20) { // when to remove stars
-        stars.removeChild(stars.lastChild);
+        if (stars.childElementCount > 1) {
+            stars.removeChild(stars.lastChild);
+        }
     }
 
     if (trackedTime[0] == 0 && trackedTime[1] == 0 && openCards.length === 1 && moveCounter === 0 && matchedCards === 0) {
