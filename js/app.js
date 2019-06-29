@@ -17,9 +17,9 @@ var moveCounterDisplay = document.querySelector('.moves');
 var trackedTimeDisplay = document.querySelector('.timer');
 var modal = document.querySelector('.modal');
 var modalMsg = document.querySelector('.modal-msg');
+var availCards = document.querySelectorAll('li.card');
 
 const modalClose = document.querySelector('.close');
-const availCards = document.querySelectorAll('li.card');
 const cardIcons = document.querySelectorAll('li.card i');
 const restartButton = document.querySelector('.restart'); 
 const stars = document.querySelector('.stars'); 
@@ -30,22 +30,10 @@ moveCounterDisplay.innerHTML = moveCounter;
 var trackedTime = [0,0];
 var activeTimeTracker;
 
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
-
 /* EVENT LISTENERS */
 
 restartButton.addEventListener('click', restartGame);
 
-// need to redo this for performance -- custom Div? though that killed the design last time
 for (var i = 0; i < availCards.length; ++i) {
     availCards[i].addEventListener('click', showCard);
 } 
@@ -74,12 +62,17 @@ function addMove() {
     moveCounterDisplay.innerHTML = moveCounter;
 }
 
-function showCard(event) { //BUG: need to not be able to select the same card twice
-    if (openCards.length < 2) { //show face of card
-        event.target.classList.add('open', 'show'); 
-    } 
+function showCard(event) {
+    if (event.target.classList.contains('card') && !event.target.classList.contains('match')) {
+        if (openCards.length < 2) { //show face of card if not already shown
+            event.target.classList.add('open'); 
+        } 
 
-    openCards.push(event.target);
+        if (event.target != openCards[0]) {
+            openCards.push(event.target);
+        }
+    }
+
     if (openCards.length === 2) { //add to open card list
         const firstIcon = openCards[0].firstElementChild.classList.value;
         const secondIcon = openCards[1].firstElementChild.classList.value;
@@ -87,14 +80,14 @@ function showCard(event) { //BUG: need to not be able to select the same card tw
         if (firstIcon === secondIcon) {
             for (const card of openCards) {
                 card.classList.add('match');
-                card.classList.remove('open', 'show');
+                card.classList.remove('open');
             }
             matchedCards += 1;
             openCards = [];
         } else {
             setTimeout(() => {
                 for (const card of openCards) {
-                    card.classList.remove('open', 'show');
+                    card.classList.remove('open');
                 }
                 openCards = [];
             }, 500);
@@ -107,7 +100,7 @@ function showCard(event) { //BUG: need to not be able to select the same card tw
         stars.removeChild(stars.lastChild);
     }
 
-    if (trackedTime[0] == 0 && trackedTime[1] == 0 && openCards.length === 1 && moveCounter === 0) {
+    if (trackedTime[0] == 0 && trackedTime[1] == 0 && openCards.length === 1 && moveCounter === 0 && matchedCards === 0) {
         startTime(); // all conditions needed to hold off multiple startTimes upon fast clicks
     }
 
@@ -131,7 +124,7 @@ function stopTime() {
 function resetTime() {
     trackedTime = [0,0];
 
-    displayTime();
+    stopTime();
 }
 
 function trackTime() {
@@ -203,7 +196,7 @@ function restartGame() {
     cardList = shuffle(cardList);
 
     for (var i = 0; i < availCards.length; ++i) {
-        availCards[i].classList.remove('open', 'show', 'match');
+        availCards[i].classList.remove('open', 'match');
     }
     
     for (var i = 0; i < availCards.length; ++i) {
@@ -215,10 +208,12 @@ function restartGame() {
 
     while (stars.childElementCount < 3) {
         const star = document.createElement('li'); 
-        star.innerHTML = '<i class="fa fa-star"></i>'; //better way to do this than declare every time?
+        star.innerHTML = '<i class="fa fa-star"></i>';
         stars.appendChild(star);
     }
 
+    matchedCards = 0; 
+    openCards = [];
     resetTime();
 }
 
