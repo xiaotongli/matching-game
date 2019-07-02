@@ -23,6 +23,7 @@ const modalClose = document.querySelector('.close');
 const cardIcons = document.querySelectorAll('li.card i');
 const restartButton = document.querySelector('.restart'); 
 const stars = document.querySelector('.stars'); 
+const playAgain = document.querySelector('.play-again');
 
 
 moveCounterDisplay.innerHTML = moveCounter;
@@ -39,6 +40,8 @@ for (var i = 0; i < availCards.length; ++i) {
 } 
 
 modalClose.addEventListener('click', closeModal);
+
+playAgain.addEventListener('click', restartGame);
 
 /* FUNCTIONS */
 
@@ -172,7 +175,7 @@ function winGame() {
         } 
 
         if (moveCounter > 20) {
-            modalMsg.innerHTML = 'Nice! <br><br> You have earned 1 of the 3 stars by completing all matches in ' + trackedTime[1] + ' seconds. <br><br> Play again and try to get all 3 stars!';
+            modalMsg.innerHTML = 'Nice! <br><br> You have earned 1 of the 3 stars by completing all matches in ' + trackedTime[1] + ' seconds.';
         }
     } else {
         if (moveCounter <= 15) {
@@ -184,9 +187,11 @@ function winGame() {
         } 
 
         if (moveCounter > 20) {
-            modalMsg.innerHTML = 'Nice! <br><br> You have earned 1 of the 3 stars by completing all matches in ' + trackedTime[0] + ' minute(s) ' + trackedTime[1] + ' seconds. <br><br> Play again and try to get all 3 stars!';
+            modalMsg.innerHTML = 'Nice! <br><br> You have earned 1 of the 3 stars by completing all matches in ' + trackedTime[0] + ' minute(s) ' + trackedTime[1] + ' seconds.';
         }
     }    
+
+    modalMsg.innerHTML += "<br><br>Play again? <br><br>";
 }
 
 function closeModal() {
@@ -217,5 +222,6 @@ function restartGame() {
     matchedCards = 0; 
     openCards = [];
     resetTime();
+    closeModal();
 }
 
